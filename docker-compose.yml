@@ -1,0 +1,60 @@
+version: '3.9'
+services:
+  vrauth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vrauth-service
+    restart: always
+    ports:
+      - ${SERVICE_HOST_PORT}:${SERVICE_CONTAINER_PORT}
+    networks:
+      - ${VRABIA_NETWORK}
+    env_file:
+      - .envrc
+    depends_on:
+      vrauthdb:
+        condition: service_healthy
+
+  vrauthdb:
+    image: mysql:latest
+    container_name: vrauthdb
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - ${DB_HOST_PORT}:${DB_CONTAINER_PORT}
+    networks:
+      - ${VRABIA_NETWORK}
+    env_file:
+        - .envrc
+    environment:
+      MYSQL_TCP_PORT: ${DB_CONTAINER_PORT}
+    volumes:
+      - vrauth-db-data:/var/lib/mysql
+    healthcheck:
+        test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
+        timeout: 20s
+        retries: 10
+
+  vrauthway:
+    image: flyway/flyway:latest
+    container_name: vrauthway
+    environment:
+      FLYWAY_USER: ${MYSQL_USER}
+      FLYWAY_PASSWORD: ${MYSQL_PASSWORD}
+      FLYWAY_URL: jdbc:mysql://vrauthdb:${DB_CONTAINER_PORT}/${MYSQL_DATABASE}
+    command: [ "repair", "migrate", "info", "-connectRetries=10" ]
+    networks:
+      - ${VRABIA_NETWORK}
+    volumes:
+      - ./sql_versions:/flyway/sql
+    depends_on:
+      vrauthdb:
+        condition: service_healthy
+
+networks:
+  vrabia-network:
+    driver: bridge
+
+volumes:
+  vrauth-db-data:
