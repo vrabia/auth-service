@@ -1,5 +1,7 @@
 server:
   port: ${SERVICE_CONTAINER_PORT:8080}
+  servlet:
+      context-path: ${SERVICE_CONTEXT_PATH:/}
 spring:
   jpa:
     hibernate:
@@ -15,8 +17,10 @@ spring:
             sharedCache:
                 mode: UNSPECIFIED
     open-in-view: false
+  main:
+    allow-bean-definition-overriding: true
   profiles:
-    default: localdb
+    default: localdb, common
 
 logging:
   file:
@@ -31,3 +35,7 @@ logging:
               BasicBinder: TRACE
       springframework:
         web:  ${LOG_LEVEL:INFO}
+
+jwt:
+  issuer: ${JWT_ISSUER}
+  secret: ${JWT_SECRET}
