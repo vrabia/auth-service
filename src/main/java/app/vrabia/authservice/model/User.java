@@ -1,5 +1,6 @@
 package app.vrabia.authservice.model;
 
+import app.vrabia.vrcommon.models.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,11 +9,12 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "VRUSERS")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -48,16 +50,14 @@ public class User {
     @Enumerated(EnumType.STRING)
     private MusicGenre genre;
 
-    @Column(name = "CREATED")
-    private Date createdAt;
+    @ElementCollection(targetClass = Role.class)
+    @CollectionTable(name = "VRUSERS_ROLES", joinColumns = @JoinColumn(name = "USER_ID"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ROLE_NAME", nullable = false, columnDefinition = "VARCHAR(255) COLLATE utf8_bin")
+    private List<Role> roles;
 
-    @Column(name = "UPDATED")
-    private Date updatedAt;
 
-    @Column(name = "VERSION")
-    private int version;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ADDRESS_ID")
     private Address address;
 }

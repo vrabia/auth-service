@@ -30,4 +30,8 @@ public class Address {
 
     @Column(name = "ZIP")
     private String zip;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
+    private User user;
 }
