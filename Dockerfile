@@ -7,8 +7,6 @@ RUN mkdir -p /root/.m2 \
 COPY settings.xml /root/.m2
 
 WORKDIR /app
-COPY .mvn ./.mvn
-COPY mvnw  ./
 COPY pom.xml ./
 COPY src ./src
 

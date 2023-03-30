@@ -1,6 +1,7 @@
 package app.vrabia.authservice.dto.request;
 
 import app.vrabia.authservice.model.MusicGenre;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,11 +14,17 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 public class RegisterUserDTORequest {
+    @NotNull
     private String name;
+    @NotNull
     private String email;
+    @NotNull
     private LocalDate birthdate;
     private String about;
+    @NotNull
     private MusicGenre genre;
+    @NotNull
     private String password;
+    @NotNull
     private AddressDTORequest address;
 }

@@ -2,6 +2,7 @@ package app.vrabia.authservice.controller;
 
 import app.vrabia.authservice.dto.request.CredentialsDTORequest;
 import app.vrabia.authservice.dto.request.RegisterUserDTORequest;
+import app.vrabia.authservice.dto.response.UserDTOResponse;
 import app.vrabia.authservice.model.AuthenticationType;
 import app.vrabia.authservice.service.AuthenticationService;
 import app.vrabia.vrcommon.exception.ErrorCodes;
@@ -11,15 +12,13 @@ import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -72,12 +71,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> registerHandler(@RequestBody RegisterUserDTORequest body) {
+    public ResponseEntity<UserDTOResponse> registerHandler(@RequestBody RegisterUserDTORequest body) {
         log.info("Register request received");
 
-        authenticationService.registerUser(body);
+        UserDTOResponse createdUser = authenticationService.registerUser(body);
 
-        return ResponseEntity.created(null).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     private AuthenticationType checkAuthenticationType(CredentialsDTORequest body) {

@@ -1,6 +1,8 @@
 package app.vrabia.authservice.service;
 
 import app.vrabia.authservice.dto.request.RegisterUserDTORequest;
+import app.vrabia.authservice.dto.response.UserDTOResponse;
+import app.vrabia.authservice.mappers.UserMapper;
 import app.vrabia.authservice.model.Address;
 import app.vrabia.authservice.repository.AddressRepository;
 import app.vrabia.authservice.repository.UserRepository;
@@ -28,6 +30,7 @@ public class AuthenticationService implements UserDetailsService {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -51,7 +54,7 @@ public class AuthenticationService implements UserDetailsService {
         );
     }
 
-    public void registerUser(RegisterUserDTORequest user) {
+    public UserDTOResponse registerUser(RegisterUserDTORequest user) {
         app.vrabia.authservice.model.User newUser = new app.vrabia.authservice.model.User();
         newUser.setUsername(generateUsername(user));
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -63,14 +66,15 @@ public class AuthenticationService implements UserDetailsService {
         newUser.setAbout(user.getAbout());
         newUser.setAddress(buildAddress(user));
         addressRepository.save(newUser.getAddress());
-        userRepository.save(newUser);
+        app.vrabia.authservice.model.User createdUser = userRepository.save(newUser);
         newUser.getAddress().setUser(newUser);
         try {
-
             addressRepository.saveAndFlush(newUser.getAddress());
         } catch (Exception e) {
             throw new VrabiaException(ErrorCodes.UNIQUE_EMAIL);
         }
+
+        return userMapper.userToUserDTOResponse(createdUser);
     }
 
     private Address buildAddress(RegisterUserDTORequest user) {
