@@ -12,6 +12,8 @@ public class AuthServiceSecurityBeans {
         PublicEndpoints publicEndpoints = new PublicEndpoints();
         publicEndpoints.getEndpoints().add("/auth/login");
         publicEndpoints.getEndpoints().add("/auth/register");
+        publicEndpoints.getEndpoints().add("/auth/device");
+        publicEndpoints.getEndpoints().add("/auth/device/step2");
         return publicEndpoints;
     }
 }
