@@ -1,19 +1,17 @@
 package app.vrabia.authservice.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "DEVICE_AUTHENTICATION")
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class DeviceAuthentication {
 
     @Id
@@ -38,6 +36,6 @@ public class DeviceAuthentication {
     @Column(name = "USER_CODE")
     private String userCode;
 
-    @Column(name = "EXIRATION_DATE")
-    private Date expirationDate;
+    @Column(name = "EXPIRATION_DATE")
+    private LocalDate expirationDate;
 }

@@ -26,7 +26,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 public class AuthenticationService implements UserDetailsService {
-
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final PasswordEncoder passwordEncoder;

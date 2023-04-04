@@ -39,3 +39,7 @@ logging:
 jwt:
   issuer: ${JWT_ISSUER}
   secret: ${JWT_SECRET}
+
+website:
+  url: ${WEBSITE_URL}
+  device-url: ${WEBSITE_DEVICE_URL}
