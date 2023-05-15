@@ -1,4 +1,4 @@
-package app.vrabia.authservice.model;
+package app.vrabia.authservice.dto.enums;
 
 public enum MusicGenre {
     ROCK,

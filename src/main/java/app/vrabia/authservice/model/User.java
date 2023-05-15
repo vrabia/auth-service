@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -28,9 +27,6 @@ public class User {
     )
     private String id;
 
-    @Column(name = "NAME")
-    private String name;
-
     @Column(name = "USERNAME")
     private String username;
 
@@ -40,24 +36,9 @@ public class User {
     @Column(name = "PASSWORD")
     private String password;
 
-    @Column(name = "BIRTHDATE")
-    private LocalDate birthdate;
-
-    @Column(name = "ABOUT")
-    private String about;
-
-    @Column(name = "GENRE")
-    @Enumerated(EnumType.STRING)
-    private MusicGenre genre;
-
     @ElementCollection(targetClass = Role.class)
     @CollectionTable(name = "VRUSERS_ROLES", joinColumns = @JoinColumn(name = "USER_ID"))
     @Enumerated(EnumType.STRING)
     @Column(name = "ROLE_NAME", nullable = false, columnDefinition = "VARCHAR(255) COLLATE utf8_bin")
     private List<Role> roles;
-
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ADDRESS_ID")
-    private Address address;
 }

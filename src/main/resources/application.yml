@@ -21,6 +21,14 @@ spring:
     allow-bean-definition-overriding: true
   profiles:
     default: localdb, common
+  kafka:
+    bootstrap-servers: ${KAFKA_HOST_NAME}:${KAFKA_HOST_PORT}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: "*"
+
 
 logging:
   file:

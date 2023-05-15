@@ -68,8 +68,9 @@ public class AuthenticationController {
         List<String> userRoles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
+        UserDTOResponse user = authenticationService.getUserByUsername(userDetails.getUsername());
 
-        String token = jwtUtil.createAccessToken(userDetails.getUsername(), userRoles);
+        String token = jwtUtil.createAccessToken(userDetails.getUsername(), user.getEmail(), user.getId(), userRoles);
         log.info("Token created: {}", token);
 
         Cookie authCookie = new Cookie("AccessToken", token);
@@ -105,9 +106,11 @@ public class AuthenticationController {
         switch (response.getStatus()) {
             case AUTHORIZED -> {
                 List<String> roles = response.getUser().getRoles().stream().map(Role::name).toList();
-                Cookie authCookie = new Cookie("AccessToken", jwtUtil.createAccessToken(response.getUser().getUsername(), roles));
+                HttpHeaders headers = new HttpHeaders();
+                UserDTOResponse user = response.getUser();
+                headers.add("token", jwtUtil.createAccessToken(user.getUsername(), user.getEmail(), user.getId(), roles));
                 return ResponseEntity.ok()
-                        .headers(createHeadersWithCookie(authCookie)).build();
+                        .headers(headers).build();
             }
             case PENDING -> {
                 return ResponseEntity.status(HttpStatus.ACCEPTED).build();

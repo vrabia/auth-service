@@ -16,6 +16,7 @@ import app.vrabia.vrcommon.exception.VrabiaException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +42,7 @@ public class DeviceAuthenticationService {
 
     public DeviceAuthenticationResponseDTO registerDevice(DeviceAuthenticationRequestDTO deviceAuthenticationRequestDTO) {
         String deviceCode = UUID.randomUUID().toString();
-        String userCode = UUID.randomUUID().toString();
+        String userCode = RandomStringUtils.random(9, true, true).toUpperCase();
         DeviceAuthentication deviceAuthentication = new DeviceAuthentication();
         deviceAuthentication.setDeviceCode(deviceCode);
         deviceAuthentication.setUserCode(userCode);

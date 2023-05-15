@@ -1,6 +1,6 @@
 package app.vrabia.authservice.dto.request;
 
-import app.vrabia.authservice.model.MusicGenre;
+import app.vrabia.authservice.dto.enums.MusicGenre;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

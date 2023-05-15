@@ -1,7 +1,6 @@
 package app.vrabia.authservice.dto.response;
 
 import app.vrabia.authservice.dto.enums.DeviceAuthenticationStatus;
-import app.vrabia.authservice.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

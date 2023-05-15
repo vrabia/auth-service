@@ -2,6 +2,7 @@ package app.vrabia.authservice.config;
 
 import app.vrabia.vrcommon.config.security.FilterChainExceptionHandlerFilter;
 import app.vrabia.vrcommon.config.security.SecurityConfig;
+import app.vrabia.vrcommon.models.security.FiltersToAdd;
 import app.vrabia.vrcommon.models.security.PublicEndpoints;
 import app.vrabia.vrcommon.service.JWTService;
 import org.springframework.context.annotation.Bean;
@@ -19,8 +20,8 @@ public class AuthServiceSecurityConfig extends SecurityConfig {
 
     private final UserDetailsService userDetailsService;
 
-    public AuthServiceSecurityConfig(JWTService jwtService, PublicEndpoints publicEndpoints, FilterChainExceptionHandlerFilter filterChainExceptionHandlerFilter, UserDetailsService userDetailsService) {
-        super(jwtService, publicEndpoints, filterChainExceptionHandlerFilter);
+    public AuthServiceSecurityConfig(JWTService jwtService, PublicEndpoints publicEndpoints, FiltersToAdd filtersToAdd, FilterChainExceptionHandlerFilter filterChainExceptionHandlerFilter, UserDetailsService userDetailsService) {
+        super(jwtService, publicEndpoints, filtersToAdd, filterChainExceptionHandlerFilter);
         this.userDetailsService = userDetailsService;
     }
 

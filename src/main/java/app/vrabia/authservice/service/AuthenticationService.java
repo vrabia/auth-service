@@ -1,10 +1,11 @@
 package app.vrabia.authservice.service;
 
+import app.vrabia.authservice.dto.kafka.AddressDTO;
+import app.vrabia.authservice.dto.kafka.UserDTO;
 import app.vrabia.authservice.dto.request.RegisterUserDTORequest;
 import app.vrabia.authservice.dto.response.UserDTOResponse;
+import app.vrabia.authservice.kafka.KafkaProducer;
 import app.vrabia.authservice.mappers.UserMapper;
-import app.vrabia.authservice.model.Address;
-import app.vrabia.authservice.repository.AddressRepository;
 import app.vrabia.authservice.repository.UserRepository;
 import app.vrabia.vrcommon.exception.ErrorCodes;
 import app.vrabia.vrcommon.exception.VrabiaException;
@@ -27,9 +28,9 @@ import java.util.Optional;
 @Transactional
 public class AuthenticationService implements UserDetailsService {
     private final UserRepository userRepository;
-    private final AddressRepository addressRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final KafkaProducer kafkaProducer;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -54,30 +55,23 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     public UserDTOResponse registerUser(RegisterUserDTORequest user) {
-        app.vrabia.authservice.model.User newUser = new app.vrabia.authservice.model.User();
+        app.vrabia.authservice.model.User newUser = userMapper.registerDTORequestToUser(user);
         newUser.setUsername(generateUsername(user));
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        newUser.setEmail(user.getEmail());
-        newUser.setName(user.getName());
         newUser.setRoles(List.of(Role.USER));
-        newUser.setGenre(user.getGenre());
-        newUser.setBirthdate(user.getBirthdate());
-        newUser.setAbout(user.getAbout());
-        newUser.setAddress(buildAddress(user));
-        addressRepository.save(newUser.getAddress());
         app.vrabia.authservice.model.User createdUser = userRepository.save(newUser);
-        newUser.getAddress().setUser(newUser);
-        try {
-            addressRepository.saveAndFlush(newUser.getAddress());
-        } catch (Exception e) {
-            throw new VrabiaException(ErrorCodes.UNIQUE_EMAIL);
-        }
+
+        // send message to kafka
+        UserDTO newUserToSave = userMapper.registerUserDTORequestToUserDTO(user);
+        newUserToSave.setAddress(buildAddress(user));
+        newUserToSave.setId(createdUser.getId());
+        kafkaProducer.send(newUserToSave);
 
         return userMapper.userToUserDTOResponse(createdUser);
     }
 
-    private Address buildAddress(RegisterUserDTORequest user) {
-        Address address = new Address();
+    private AddressDTO buildAddress(RegisterUserDTORequest user) {
+        AddressDTO address = new AddressDTO();
         address.setCountry(user.getAddress().getCountry());
         address.setCity(user.getAddress().getCity());
         address.setZip(user.getAddress().getZip());
@@ -85,15 +79,31 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     private String generateUsername(RegisterUserDTORequest user) {
+        String prefix = "@" + user.getName();
         StringBuilder username = new StringBuilder();
         username.append("@");
-        List<app.vrabia.authservice.model.User> users = userRepository.findAllByName(user.getName());
+        List<app.vrabia.authservice.model.User> users = userRepository.findByUsernameStartingWith(prefix);
         if (users.isEmpty()) {
             username.append(user.getName());
         } else {
-            username.append(user.getName()).append(users.size());
+            List<app.vrabia.authservice.model.User> actualMatches = users.stream().filter(u -> {
+                String suffix = u.getUsername().substring(prefix.length());
+                return suffix.matches("[0-9]+") || suffix.isBlank();
+            }).toList();
+
+            if (!actualMatches.isEmpty()) {
+                username.append(user.getName()).append(actualMatches.size());
+            }
         }
         return username.toString();
+    }
+
+    public UserDTOResponse getUserByUsername(String username) {
+        Optional<app.vrabia.authservice.model.User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isEmpty()) {
+            throw new VrabiaException(ErrorCodes.BAD_REQUEST);
+        }
+        return userMapper.userToUserDTOResponse(userOptional.get());
     }
 }
 
