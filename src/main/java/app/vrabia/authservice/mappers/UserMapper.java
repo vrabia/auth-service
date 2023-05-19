@@ -8,6 +8,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
+import java.util.List;
+
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL,
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = "spring")
@@ -20,5 +22,7 @@ public interface UserMapper {
     User registerDTORequestToUser(RegisterUserDTORequest registerUserDTORequest);
 
     UserDTO registerUserDTORequestToUserDTO(RegisterUserDTORequest registerUserDTORequest);
+
+    List<UserDTOResponse> usersToUsersDTOResponse(List<User> users);
 
 }
