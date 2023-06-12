@@ -42,7 +42,7 @@ public class AuthenticationController {
     private final JWTService jwtUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<Void> loginHandler(@RequestBody CredentialsDTORequest body) {
+    public ResponseEntity<UserDTOResponse> loginHandler(@RequestBody CredentialsDTORequest body) {
         log.info("Login request received");
 
         AuthenticationType authenticationType = checkAuthenticationType(body);
@@ -76,8 +76,7 @@ public class AuthenticationController {
         Cookie authCookie = new Cookie("AccessToken", token);
 
         return ResponseEntity.ok()
-                .headers(createHeadersWithCookie(authCookie)).build();
-
+                .headers(createHeadersWithCookie(authCookie)).body(user);
     }
 
     @PostMapping("/register")
