@@ -12,8 +12,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Copy settings xml file
-        run: cp ${{ github.workspace }}/settings.xml ${{ github.workspace }}/_work/auth-service/auth-service/settings.xml
+        run: cp ${{ github.workspace }}/../../../settings.xml ${{ github.workspace }}/settings.xml
       - name: Copy envrc file
-        run: cp ${{ github.workspace }}/.envrc ${{ github.workspace }}/_work/auth-service/auth-service/.envrc
+        run: cp ${{ github.workspace }}/../../../.envrc ${{ github.workspace }}/.envrc
       - name: Restart docker service
         run: docker compose up --build -d
