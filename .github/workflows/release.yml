@@ -1,0 +1,16 @@
+name: Release
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  Release:
+    name: Deploy on vrabia server
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Restart docker service
+        run: docker compose up --build -d
+
